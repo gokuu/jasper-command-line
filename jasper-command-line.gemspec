@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rspec", "~> 2.7")
   s.add_development_dependency("rake", "~> 0.9.2")
 
-  s.files       = Dir.glob("lib/**/*") + %w(README.md LICENSE CHANGELOG)
-  s.executables = %w(jasper-command-line)
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 end

@@ -1,11 +1,6 @@
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
 require 'logger'
-require 'stringio'
-require 'shellwords'
-require 'open3'
-require 'awesome_print'
-require 'fileutils'
 require "rjb"
 require 'active_support/core_ext'
 
