@@ -1,0 +1,5 @@
+#!/usr/bin/ruby
+
+require 'jasper-command-line'
+
+command_line = JasperCommandLine::CommandLine.new(*ARGV)
