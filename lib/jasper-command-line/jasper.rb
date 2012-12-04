@@ -1,3 +1,4 @@
+# encoding: utf-8
 #
 # Copyright (C) 2012 Marlus Saraiva, Rodrigo Maia
 #
@@ -54,6 +55,8 @@ module JasperCommandLine
       parameters ||= {}
       jrxml_file  = jasper_file.sub(/\.jasper$/, ".jrxml")
 
+      sign_options = options.delete(:signature)
+
       begin
         # Convert the ruby parameters' hash to a java HashMap.
         # Pay attention that, for now, all parameters are converted to string!
@@ -81,7 +84,34 @@ module JasperCommandLine
         jasper_print = JasperFillManager.fillReport(jasper_file, jasper_params)
 
         # Export it!
-        JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print)
+
+        if sign_options
+          file = Tempfile.new(['pdf-', '.pdf'])
+          signed_file = Tempfile.new(['signed-pdf-', '.pdf'])
+          begin
+            file.write JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print)
+
+            call_options = [
+              '-n',
+              '-t', file.path,
+              '-s', sign_options[:key_file],
+              '-p', %Q["#{sign_options[:password]}"],
+              '-o', signed_file.path
+            ]
+            call_options.push '-l', %Q["#{sign_options[:location]}"] if sign_options[:location]
+            call_options.push '-r', %Q["#{sign_options[:reason]}"] if sign_options[:reason]
+
+            `java -jar #{File.dirname(__FILE__)}/java/PortableSigner/PortableSigner.jar #{call_options.join(' ')}`
+
+            return File.read(signed_file.path)
+          ensure
+            file.close!
+            signed_file.close!
+          end
+        else
+          JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print)
+        end
+
       rescue Exception=>e
         if e.respond_to? 'printStackTrace'
           JasperCommandLine.logger.error e.message

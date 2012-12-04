@@ -7,6 +7,8 @@ Print a jasper document via the command line
 
 This gem embeds the .jar files provided by [jasper-rails](https://github.com/fortesinformatica/jasper-rails), so you don't need to include the gem ([jasper-rails](https://github.com/fortesinformatica/jasper-rails) requires the whole Ruby on Rails framework, which isn't necessary in this case).
 
+It also embeds the .jar files needed to digitally sign the PDF, if necessary. The PDF files are signed using [PortableSigner](http://portablesigner.sourceforge.net) by [Peter Pfläging](peter.pflaeging@wien.gv.at). All credit for the digital signature code goes to him.
+
 ## Dependencies
 
 * You need a Java Virtual Machine installed and set up in order to use this gem.
@@ -40,6 +42,13 @@ Options:
 --data-file /path/to/file  The .xml file to load the data from
 --param key=value          Adds the parameter with name key with the value value
                            (can be defined multiple times)
+
+Digital signature options:
+--sign-key-file /path/to/file  The location of the PKCS12 file to
+                               digitally sign the PDF with
+--sign-password password       The password for the PKCS12 file
+--sign-location location       The location of the signature
+--sign-reason reason           The reason for signing the PDF
 ```
 ## LICENSE
 

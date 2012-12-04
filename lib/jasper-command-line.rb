@@ -3,7 +3,7 @@ $LOAD_PATH.unshift File.dirname(__FILE__)
 require 'logger'
 require "rjb"
 require 'active_support/core_ext'
-
+require 'tempfile'
 require 'jasper-command-line/version'
 require 'jasper-command-line/command_line'
 require 'jasper-command-line/jasper'

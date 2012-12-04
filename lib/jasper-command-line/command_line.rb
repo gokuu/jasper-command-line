@@ -17,9 +17,26 @@ module JasperCommandLine
           puts "--data-file /path/to/file  The .xml file to load the data from"
           puts "--param key=value          Adds the parameter with name key with the value value"
           puts "                           (can be defined multiple times)"
+          puts ""
+          puts "Digital signature options:"
+          puts "--sign-key-file /path/to/file  The location of the PKCS12 file to"
+          puts "                               digitally sign the PDF with"
+          puts "--sign-password password       The password for the PKCS12 file"
+          puts "--sign-location location       The location of the signature"
+          puts "--sign-reason reason           The reason for signing the PDF"
         else
           if options[:jasper_file]
-            puts JasperCommandLine::Jasper::render_pdf(options[:jasper_file], options[:data], options[:params], {})
+            jasper_file = options.delete :jasper_file
+            data = options.delete :data
+            params = options.delete :params
+
+            if options[:signature]
+              if options[:signature][:key_file] && !options[:signature][:password]
+                raise ArgumentError.new("Password not supplied for certificate")
+              end
+            end
+
+            puts JasperCommandLine::Jasper::render_pdf(jasper_file, data, params, options)
           end
         end
       rescue ArgumentError => e
@@ -66,10 +83,41 @@ module JasperCommandLine
             when 'jasper'
               # Or a file
               i = get_option_data(arguments, i) do |argument_data|
-                raise ArgumentError.new("File not found: #{argument_data}") unless File.exists?(argument_data)
+                raise ArgumentError.new("File not found: #{argument_data}") unless File.exists?(argument_data) || File.exists?(argument_data.gsub(/\.jasper$/, '.jrxml'))
                 data[:jasper_file] = argument_data
               end
 
+            when 'sign-key-file'
+              # Sign document with file
+              i = get_option_data(arguments, i) do |argument_data|
+                raise ArgumentError.new("Signature key file not found: #{argument_data}") unless File.exists?(argument_data)
+                data[:signature] ||= {}
+                data[:signature][:key_file] = argument_data
+              end
+
+            when 'sign-location'
+              # Location to set on the signature
+              i = get_option_data(arguments, i) do |argument_data|
+                data[:signature] ||= {}
+                data[:signature][:location] = argument_data
+              end
+
+            when 'sign-password'
+              # Password to open the signature key file
+              i = get_option_data(arguments, i) do |argument_data|
+                data[:signature] ||= {}
+                data[:signature][:password] = argument_data
+              end
+
+            when 'sign-reason'
+              # Reason to set on the signature
+              i = get_option_data(arguments, i) do |argument_data|
+                data[:signature] ||= {}
+                data[:signature][:reason] = argument_data
+              end
+
+            else
+              i += 1
           end
         end
 
