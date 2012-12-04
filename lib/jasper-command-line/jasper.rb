@@ -86,27 +86,35 @@ module JasperCommandLine
         # Export it!
 
         if sign_options
-          file = Tempfile.new(['pdf-', '.pdf'])
-          signed_file = Tempfile.new(['signed-pdf-', '.pdf'])
+          temp_file = Tempfile.new(['pdf-', '.pdf'])
+          temp_signed_file = Tempfile.new(['signed-pdf-', '.pdf'])
+          file = temp_file.path
+          signed_file = temp_signed_file.path
+
+          temp_file.close!
+          temp_signed_file.close!
+
+          File.open(file, 'wb') { |f| f.write JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print) }
+
+          call_options = [
+            '-n',
+            '-t', file,
+            '-s', sign_options[:key_file],
+            '-p', %Q["#{sign_options[:password]}"],
+            '-o', signed_file
+          ]
+          call_options.push '-l', %Q["#{sign_options[:location]}"] if sign_options[:location]
+          call_options.push '-r', %Q["#{sign_options[:reason]}"] if sign_options[:reason]
+
+          `java -jar #{File.dirname(__FILE__)}/java/PortableSigner/PortableSigner.jar #{call_options.join(' ')}`
+
           begin
-            file.write JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print)
-
-            call_options = [
-              '-n',
-              '-t', file.path,
-              '-s', sign_options[:key_file],
-              '-p', %Q["#{sign_options[:password]}"],
-              '-o', signed_file.path
-            ]
-            call_options.push '-l', %Q["#{sign_options[:location]}"] if sign_options[:location]
-            call_options.push '-r', %Q["#{sign_options[:reason]}"] if sign_options[:reason]
-
-            `java -jar #{File.dirname(__FILE__)}/java/PortableSigner/PortableSigner.jar #{call_options.join(' ')}`
-
-            return File.read(signed_file.path)
+            return File.read(signed_file)
           ensure
-            file.close!
-            signed_file.close!
+            begin
+              File.unlink file, signed_file
+            rescue
+            end
           end
         else
           JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print)
