@@ -15,6 +15,7 @@ It also embeds the .jar files needed to digitally sign the PDF, if necessary. Th
 * [rjb](http://rjb.rubyforge.org/) >= 1.4.0
 * [builder](https://rubygems.org/gems/builder) >= 3.0.3
 * [activesupport](https://rubygems.org/gems/activesupport) >= 3.2.0
+* [pdf-merger](https://github.com/paulschreiber/pdf-merger) >= 0.3.1
 
 ## Install
 
@@ -40,6 +41,7 @@ Options:
                            compiled from the .jrxml file with the same name and
                            on the same location)
 --data-file /path/to/file  The .xml file to load the data from
+--copies number            The number of copies to generate
 --param key=value          Adds the parameter with name key with the value value
                            (can be defined multiple times)
 

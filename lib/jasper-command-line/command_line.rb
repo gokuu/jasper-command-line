@@ -15,6 +15,7 @@ module JasperCommandLine
           puts "                           compiled from the .jrxml file with the same name and"
           puts "                           on the same location)"
           puts "--data-file /path/to/file  The .xml file to load the data from"
+          puts "--copies number            The number of copies to generate"
           puts "--param key=value          Adds the parameter with name key with the value value"
           puts "                           (can be defined multiple times)"
           puts ""
@@ -81,10 +82,15 @@ module JasperCommandLine
               end
 
             when 'jasper'
-              # Or a file
               i = get_option_data(arguments, i) do |argument_data|
                 raise ArgumentError.new("File not found: #{argument_data}") unless File.exists?(argument_data) || File.exists?(argument_data.gsub(/\.jasper$/, '.jrxml'))
                 data[:jasper_file] = argument_data
+              end
+
+            when 'copies'
+              i = get_option_data(arguments, i) do |argument_data|
+                raise ArgumentError.new("Invalid number of copies: #{argument_data}") unless argument_data =~ /^[1-9][0-9]*$/
+                data[:copies] = argument_data.to_i
               end
 
             when 'sign-key-file'

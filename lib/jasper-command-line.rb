@@ -7,6 +7,7 @@ require 'tempfile'
 require 'jasper-command-line/version'
 require 'jasper-command-line/command_line'
 require 'jasper-command-line/jasper'
+require 'pdf/merger'
 
 module JasperCommandLine
   def self.logger=(log)
