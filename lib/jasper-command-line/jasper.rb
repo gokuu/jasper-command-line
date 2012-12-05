@@ -129,8 +129,6 @@ module JasperCommandLine
           call_options.push '-r', %Q["#{sign_options[:reason]}"] if sign_options[:reason]
 
           `java -jar #{File.dirname(__FILE__)}/java/PortableSigner/PortableSigner.jar #{call_options.join(' ')}`
-
-          created_files << signed_file
         else
           signed_file = file
         end
