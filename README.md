@@ -12,10 +12,10 @@ It also embeds the .jar files needed to digitally sign the PDF, if necessary. Th
 ## Dependencies
 
 * You need a Java Virtual Machine installed and set up in order to use this gem.
+* [Ghostscript](http://www.ghostscript.com) to merge PDFs into a single document
 * [rjb](http://rjb.rubyforge.org/) >= 1.4.0
 * [builder](https://rubygems.org/gems/builder) >= 3.0.3
 * [activesupport](https://rubygems.org/gems/activesupport) >= 3.2.0
-* [pdf-merger](https://github.com/paulschreiber/pdf-merger) >= 0.3.1
 
 ## Install
 
@@ -52,6 +52,7 @@ Digital signature options:
 --sign-location location       The location of the signature
 --sign-reason reason           The reason for signing the PDF
 ```
+
 ## LICENSE
 
 Copyright (C) 2012 Pedro Rodrigues

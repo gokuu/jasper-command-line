@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   s.add_dependency('rjb', '>= 1.4.0')
   s.add_dependency('builder', '>= 3.0.3')
   s.add_dependency('activesupport', '>= 3.2.0')
-  s.add_dependency('pdf-merger', '>= 0.3.1')
   s.add_development_dependency("rspec", "~> 2.7")
   s.add_development_dependency("rake", "~> 0.9.2")
 

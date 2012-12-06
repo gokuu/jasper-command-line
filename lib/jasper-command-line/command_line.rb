@@ -91,6 +91,8 @@ module JasperCommandLine
               i = get_option_data(arguments, i) do |argument_data|
                 raise ArgumentError.new("Invalid number of copies: #{argument_data}") unless argument_data =~ /^[1-9][0-9]*$/
                 data[:copies] = argument_data.to_i
+
+                raise ArgumentError.new("Ghostscript isn't available. Merging is not possible") if data[:copies] > 1 && !JasperCommandLine.ghostscript_available?
               end
 
             when 'sign-key-file'

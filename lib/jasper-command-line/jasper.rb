@@ -87,11 +87,12 @@ module JasperCommandLine
         temp_file.close!
 
         created_files = [file]
-
-        pdf = PDF::Merger.new
+        merge_pdf_command_line = "gs -q -dBATCH -dPDFSETTINGS=/prepress -dNOPAUSE -sDEVICE=pdfwrite -dEmbedAllFonts=true -sOutputFile=#{file}"
 
         # Export n copies and merge them into one file
         options[:copies] ||= 1
+
+        copy_file = nil
 
         (1..options[:copies]).each do |copy|
           copy_temp_file = Tempfile.new(["pdf-#{copy}-", '.pdf'])
@@ -103,12 +104,17 @@ module JasperCommandLine
 
           File.open(copy_file, 'wb') { |f| f.write JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print) }
 
-          pdf.add_file copy_file
+          merge_pdf_command_line << " #{copy_file}"
 
           created_files << copy_file
         end
 
-        pdf.save_as file
+        if options[:copies] > 1
+          # Use GhostScript to create a single page
+          `#{merge_pdf_command_line}`
+        else
+          file = copy_file
+        end
 
         # Digitally sign the file, if necessary
         if sign_options

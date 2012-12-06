@@ -7,14 +7,13 @@ require 'tempfile'
 require 'jasper-command-line/version'
 require 'jasper-command-line/command_line'
 require 'jasper-command-line/jasper'
-require 'pdf/merger'
 
 module JasperCommandLine
   def self.logger=(log)
     @logger = log
   end
 
-  # Get AppleTvConverter logger.
+  # Get jasper-command-line logger.
   #
   # @return [Logger]
   def self.logger
@@ -22,5 +21,9 @@ module JasperCommandLine
     logger = Logger.new(STDOUT)
     logger.level = Logger::INFO
     @logger = logger
+  end
+
+  def self.ghostscript_available?
+    !`which gs`.empty?
   end
 end
