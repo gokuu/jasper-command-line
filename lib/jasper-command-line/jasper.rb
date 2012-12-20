@@ -140,23 +140,18 @@ module JasperCommandLine
         end
 
         begin
-          return File.read(signed_file)
+          file_contents = File.read(signed_file)
+          raise 'Invalid PDF file' unless file_contents[0..file_contents.index("\n")].chomp =~ /^%PDF-.*?$/
+
+          puts file_contents
         ensure
-          begin
-            File.unlink *created_files
-          rescue => e
-            puts e.message
-          end
+          created_files.each { |file| File.unlink file if File.exists?(file) }
         end
 
-      rescue Exception=>e
-        if e.respond_to? 'printStackTrace'
-          JasperCommandLine.logger.error e.message
-          e.printStackTrace
-        else
-          JasperCommandLine.logger.error e.message + "\n " + e.backtrace.join("\n ")
-        end
-        raise e
+      rescue Exception => e
+        JasperCommandLine.logger.error e.message + "\n " + e.backtrace.join("\n ")
+
+        abort e.message
       end
     end
   end
