@@ -23,64 +23,40 @@
 
 
 module JasperCommandLine
-  classpath = '.'
-  Dir["#{File.dirname(__FILE__)}/java/*.jar"].each do |jar|
-    classpath << File::PATH_SEPARATOR + File.expand_path(jar)
-  end
-
-  Dir["lib/*.jar"].each do |jar|
-    classpath << File::PATH_SEPARATOR + File.expand_path(jar)
-  end
-
-  Rjb::load( classpath, ['-Djava.awt.headless=true','-Xms128M', '-Xmx256M'] )
-
-  JRException                 = Rjb::import 'net.sf.jasperreports.engine.JRException'
-  JasperCompileManager        = Rjb::import 'net.sf.jasperreports.engine.JasperCompileManager'
-  JasperExportManager         = Rjb::import 'net.sf.jasperreports.engine.JasperExportManager'
-  JasperFillManager           = Rjb::import 'net.sf.jasperreports.engine.JasperFillManager'
-  JasperPrint                 = Rjb::import 'net.sf.jasperreports.engine.JasperPrint'
-  JRXmlUtils                  = Rjb::import 'net.sf.jasperreports.engine.util.JRXmlUtils'
-  # This is here to avoid the "already initialized constant QUERY_EXECUTER_FACTORY_PREFIX" warnings.
-  JRXPathQueryExecuterFactory = silence_warnings{Rjb::import 'net.sf.jasperreports.engine.query.JRXPathQueryExecuterFactory'}
-  InputSource                 = Rjb::import 'org.xml.sax.InputSource'
-  StringReader                = Rjb::import 'java.io.StringReader'
-  HashMap                     = Rjb::import 'java.util.HashMap'
-  ByteArrayInputStream        = Rjb::import 'java.io.ByteArrayInputStream'
-  JavaString                  = Rjb::import 'java.lang.String'
-  JFreeChart                  = Rjb::import 'org.jfree.chart.JFreeChart'
-
   module Jasper
     def self.render_pdf(jasper_file, datasource, parameters, options)
+      initialize_engine
+
       options ||= {}
       parameters ||= {}
       jrxml_file  = jasper_file.sub(/\.jasper$/, ".jrxml")
 
       sign_options = options.delete(:signature)
 
-      begin
+      # begin
         # Convert the ruby parameters' hash to a java HashMap.
         # Pay attention that, for now, all parameters are converted to string!
-        jasper_params = HashMap.new
+        jasper_params = @hashMap.new
         parameters.each do |k,v|
-          jasper_params.put(JavaString.new(k.to_s), JavaString.new(v.to_s))
+          jasper_params.put(@javaString.new(k.to_s), @javaString.new(v.to_s))
         end
 
         # Compile it, if needed
         if !File.exist?(jasper_file) || (File.exist?(jrxml_file) && File.mtime(jrxml_file) > File.mtime(jasper_file))
-          JasperCompileManager.compileReportToFile(jrxml_file, jasper_file)
+          @jasperCompileManager.compileReportToFile(jrxml_file, jasper_file)
         end
 
         datasource = datasource.to_xml(options).to_s unless datasource.is_a?(String)
 
         # Fill the report
-        input_source = InputSource.new
-        input_source.setCharacterStream(StringReader.new(datasource))
+        input_source = @inputSource.new
+        input_source.setCharacterStream(@stringReader.new(datasource))
         data_document = silence_warnings do
           # This is here to avoid the "already initialized constant DOCUMENT_POSITION_*" warnings.
-          JRXmlUtils._invoke('parse', 'Lorg.xml.sax.InputSource;', input_source)
+          @jRXmlUtils._invoke('parse', 'Lorg.xml.sax.InputSource;', input_source)
         end
 
-        jasper_params.put(JRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT, data_document)
+        jasper_params.put(@jRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT, data_document)
 
         temp_file = Tempfile.new(['pdf-', '.pdf'])
         file = temp_file.path
@@ -99,10 +75,10 @@ module JasperCommandLine
           copy_file = copy_temp_file.path
           copy_temp_file.close!
 
-          jasper_params.put JavaString.new('copy_number'), JavaString.new(copy.to_s)
-          jasper_print = JasperFillManager.fillReport(jasper_file, jasper_params)
+          jasper_params.put @javaString.new('copy_number'), @javaString.new(copy.to_s)
+          jasper_print = @jasperFillManager.fillReport(jasper_file, jasper_params)
 
-          File.open(copy_file, 'wb') { |f| f.write JasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print) }
+          File.open(copy_file, 'wb') { |f| f.write @jasperExportManager._invoke('exportReportToPdf', 'Lnet.sf.jasperreports.engine.JasperPrint;', jasper_print) }
 
           merge_pdf_command_line << " #{copy_file}"
 
@@ -148,11 +124,41 @@ module JasperCommandLine
           created_files.each { |file| File.unlink file if File.exists?(file) }
         end
 
-      rescue Exception => e
-        JasperCommandLine.logger.error e.message + "\n " + e.backtrace.join("\n ")
+      # rescue Exception => e
+      #   JasperCommandLine.logger.error e.message + "\n " + e.backtrace.join("\n ")
 
-        abort e.message
-      end
+      #   abort e.message
+      # end
     end
+
+    private
+
+      def self.initialize_engine
+        classpath = '.'
+        Dir["#{File.dirname(__FILE__)}/java/*.jar"].each do |jar|
+          classpath << File::PATH_SEPARATOR + File.expand_path(jar)
+        end
+
+        Dir["lib/*.jar"].each do |jar|
+          classpath << File::PATH_SEPARATOR + File.expand_path(jar)
+        end
+
+        Rjb::load( classpath, ['-Djava.awt.headless=true','-Xms128M', '-Xmx256M'] )
+
+        @jRException                 = Rjb::import 'net.sf.jasperreports.engine.JRException'
+        @jasperCompileManager        = Rjb::import 'net.sf.jasperreports.engine.JasperCompileManager'
+        @jasperExportManager         = Rjb::import 'net.sf.jasperreports.engine.JasperExportManager'
+        @jasperFillManager           = Rjb::import 'net.sf.jasperreports.engine.JasperFillManager'
+        @jasperPrint                 = Rjb::import 'net.sf.jasperreports.engine.JasperPrint'
+        @jRXmlUtils                  = Rjb::import 'net.sf.jasperreports.engine.util.JRXmlUtils'
+        # This is here to avoid the "already initialized constant QUERY_EXECUTER_FACTORY_PREFIX" warnings.
+        @jRXPathQueryExecuterFactory = silence_warnings{Rjb::import 'net.sf.jasperreports.engine.query.JRXPathQueryExecuterFactory'}
+        @inputSource                 = Rjb::import 'org.xml.sax.InputSource'
+        @stringReader                = Rjb::import 'java.io.StringReader'
+        @hashMap                     = Rjb::import 'java.util.HashMap'
+        @byteArrayInputStream        = Rjb::import 'java.io.ByteArrayInputStream'
+        @javaString                  = Rjb::import 'java.lang.String'
+        @jFreeChart                  = Rjb::import 'org.jfree.chart.JFreeChart'
+      end
   end
 end
