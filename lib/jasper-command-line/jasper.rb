@@ -32,6 +32,7 @@ module JasperCommandLine
       jrxml_file  = jasper_file.sub(/\.jasper$/, ".jrxml")
 
       sign_options = options.delete(:signature)
+      locale_options = options.delete(:locale)
 
       # begin
         # Convert the ruby parameters' hash to a java HashMap.
@@ -57,6 +58,8 @@ module JasperCommandLine
         end
 
         jasper_params.put(@jRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT, data_document)
+
+        jasper_params.put(@jRParameter.REPORT_LOCALE, @locale.new(locale_options[:language], locale_options[:sub_language])) if locale_options
 
         temp_file = Tempfile.new(['pdf-', '.pdf'])
         file = temp_file.path
@@ -151,11 +154,13 @@ module JasperCommandLine
         @jasperFillManager           = Rjb::import 'net.sf.jasperreports.engine.JasperFillManager'
         @jasperPrint                 = Rjb::import 'net.sf.jasperreports.engine.JasperPrint'
         @jRXmlUtils                  = Rjb::import 'net.sf.jasperreports.engine.util.JRXmlUtils'
+        @jRParameter                 = Rjb::import 'net.sf.jasperreports.engine.JRParameter'
         # This is here to avoid the "already initialized constant QUERY_EXECUTER_FACTORY_PREFIX" warnings.
         @jRXPathQueryExecuterFactory = silence_warnings{Rjb::import 'net.sf.jasperreports.engine.query.JRXPathQueryExecuterFactory'}
         @inputSource                 = Rjb::import 'org.xml.sax.InputSource'
         @stringReader                = Rjb::import 'java.io.StringReader'
         @hashMap                     = Rjb::import 'java.util.HashMap'
+        @locale                      = Rjb::import 'java.util.Locale'
         @byteArrayInputStream        = Rjb::import 'java.io.ByteArrayInputStream'
         @javaString                  = Rjb::import 'java.lang.String'
         @jFreeChart                  = Rjb::import 'org.jfree.chart.JFreeChart'

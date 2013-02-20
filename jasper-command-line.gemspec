@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   s.summary     = "Use jasper-rails from the command line."
   s.description = "Use jasper-rails from the command line."
 
-  s.add_dependency('rjb', '>= 1.4.0')
-  s.add_dependency('builder', '>= 3.0.3')
+  s.add_dependency('rjb', '1.4.3')
+  s.add_dependency('builder', '>= 3.0.2')
   s.add_dependency('activesupport', '>= 3.2.0')
   s.add_development_dependency("rspec", "~> 2.7")
   s.add_development_dependency("rake", "~> 0.9.2")

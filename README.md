@@ -42,6 +42,7 @@ Options:
                            on the same location)
 --data-file /path/to/file  The .xml file to load the data from
 --copies number            The number of copies to generate
+--locale locale            The locale to use in the report (in the format xx-YY)
 --param key=value          Adds the parameter with name key with the value value
                            (can be defined multiple times)
 

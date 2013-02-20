@@ -16,6 +16,7 @@ module JasperCommandLine
           puts "                           on the same location)"
           puts "--data-file /path/to/file  The .xml file to load the data from"
           puts "--copies number            The number of copies to generate"
+          puts "--locale locale            The locale to use in the report (in the format xx-YY)"
           puts "--param key=value          Adds the parameter with name key with the value value"
           puts "                           (can be defined multiple times)"
           puts ""
@@ -93,6 +94,15 @@ module JasperCommandLine
                 data[:copies] = argument_data.to_i
 
                 raise ArgumentError.new("Ghostscript isn't available. Merging is not possible") if data[:copies] > 1 && !JasperCommandLine.ghostscript_available?
+              end
+
+            when 'locale'
+              i = get_option_data(arguments, i) do |argument_data|
+                raise ArgumentError.new("Invalid locale: #{argument_data}") unless argument_data =~ /^[a-z]{2}-[A-Za-z0-9]{2,3}$/
+                data[:locale] = {
+                  :language => argument_data.strip.split('-').first,
+                  :sub_language => argument_data.strip.split('-').last
+                }
               end
 
             when 'sign-key-file'
