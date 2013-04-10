@@ -3,11 +3,17 @@ jasper-command-line
 
 Print a jasper document via the command line
 
-**Disclaimer**: This is almost completely based on the great work by [Fortes Informática](https://github.com/fortesinformatica), with the gem [jasper-rails](https://github.com/fortesinformatica/jasper-rails). I built this out of  necessity for a project that wouldn't run [jasper-rails](https://github.com/fortesinformatica/jasper-rails) on top of Ubuntu + nginx + Passenger.
+### Disclaimer:
+This is almost completely based on the great work by [Fortes Informática](https://github.com/fortesinformatica), with the gem [jasper-rails](https://github.com/fortesinformatica/jasper-rails). I built this out of  necessity for a project that wouldn't run [jasper-rails](https://github.com/fortesinformatica/jasper-rails) on top of Ubuntu + nginx + Passenger.
 
 This gem embeds the .jar files provided by [jasper-rails](https://github.com/fortesinformatica/jasper-rails), so you don't need to include the gem ([jasper-rails](https://github.com/fortesinformatica/jasper-rails) requires the whole Ruby on Rails framework, which isn't necessary in this case).
 
 It also embeds the .jar files needed to digitally sign the PDF, if necessary. The PDF files are signed using [PortableSigner](http://portablesigner.sourceforge.net) by [Peter Pfläging](peter.pflaeging@wien.gv.at). All credit for the digital signature code goes to him.
+
+### Other acknowledgements:
+
+* [Prawn](http://prawn.majesticseacreature.com), a "Fast, Nimble PDF Writer for Ruby"
+* [Henrik Nyh](http://henrik.nyh.se/) for the auto-print addition to Prawn, [prawn-print](https://github.com/barsoom/prawn-print).
 
 ## Dependencies
 
@@ -34,24 +40,28 @@ gem "jasper-command-line"
 ## Using jasper-command-line
 
 ```
-jasper-command-line [options]
+Usage: jasper-command-line [options]
 
 Options:
---jasper /path/to/file     The .jasper file to load (if one doesn't exist, it is
-                           compiled from the .jrxml file with the same name and
-                           on the same location)
---data-file /path/to/file  The .xml file to load the data from
---copies number            The number of copies to generate
---locale locale            The locale to use in the report (in the format xx-YY)
---param key=value          Adds the parameter with name key with the value value
-                           (can be defined multiple times)
+    -j, --jasper file                The .jasper file to load (if one doesn't exist, it is compiled from the .jrxml file with the same name and on the same location)
+    -d, --data-file file             The .xml file to load the data from
+    -c, --copies number              The number of copies to generate
+    -l, --locale locale              The locale to use in the report (in the format xx-YY)
+        --param name=value           Adds the parameter with name key with the value value (can be defined multiple times)
+
+Printing options:
+    -p, --print                      Whether to generate a PDF file that automatically opens the print dialog when opened in Acrobat Reader
+    -P, --print-silent               Whether to generate a PDF file that automatically prints to the default printer when opened in Acrobat Reader
 
 Digital signature options:
---sign-key-file /path/to/file  The location of the PKCS12 file to
-                               digitally sign the PDF with
---sign-password password       The password for the PKCS12 file
---sign-location location       The location of the signature
---sign-reason reason           The reason for signing the PDF
+        --sign-key-file file         The location of the PKCS12 file to digitally sign the PDF with
+        --sign-location location     The location data for the signature
+        --sign-password password     The password for the PKCS12 file
+        --sign-reason reason         The reason for signing the PDF
+
+Common options:
+    -h, --help                       Show this message
+        --version                    Show version
 ```
 
 ## LICENSE
