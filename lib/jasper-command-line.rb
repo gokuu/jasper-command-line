@@ -7,6 +7,8 @@ require 'tempfile'
 require 'jasper-command-line/version'
 require 'jasper-command-line/command_line'
 require 'jasper-command-line/jasper'
+require 'prawn'
+require 'jasper-command-line/prawn-js'
 
 module JasperCommandLine
   def self.logger=(log)
