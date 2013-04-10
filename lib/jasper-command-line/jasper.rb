@@ -20,8 +20,6 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
 module JasperCommandLine
   module Jasper
     def self.render_pdf(jasper_file, datasource, parameters, options)
@@ -93,6 +91,18 @@ module JasperCommandLine
           `#{merge_pdf_command_line}`
         else
           file = copy_file
+        end
+
+        if options[:print] || options[:print_silent]
+          temp_file = Tempfile.new(['pdf-', '.pdf'])
+          file2 = temp_file.path
+
+          ::Prawn::Document.generate(file2, template: file) do |pdf|
+            pdf.print if options[:print]
+            pdf.print_silent if options[:print_silent]
+          end
+
+          file = file2
         end
 
         # Digitally sign the file, if necessary

@@ -72,6 +72,19 @@ module JasperCommandLine
         end
 
         opts.separator ""
+        opts.separator "Printing options:"
+
+        opts.on('-p', '--print', "Whether to generate a PDF file that automatically opens the print dialog when opened in Acrobat Reader") do
+          raise ArgumentError.new("Can't supply both --print and --print-silent") if data[:print_silent]
+          data[:print] = true
+        end
+
+        opts.on('-P', '--print-silent', "Whether to generate a PDF file that automatically prints to the default printer when opened in Acrobat Reader") do
+          raise ArgumentError.new("Can't supply both --print and --print-silent") if data[:print]
+          data[:print_silent] = true
+        end
+
+        opts.separator ""
         opts.separator "Digital signature options:"
 
         opts.on('--sign-key-file file', "The location of the PKCS12 file to digitally sign the PDF with") do |file|
