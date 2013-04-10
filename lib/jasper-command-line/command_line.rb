@@ -17,11 +17,14 @@ module JasperCommandLine
 
           puts JasperCommandLine::Jasper::render_pdf(jasper_file, data, params, options)
         end
+
+        exit 0
       rescue OptionParser::InvalidOption => e
         puts "Error: #{e.message}"
+        exit 1
       rescue => e
         puts "Error: #{e.message}"
-        puts e.backtrace
+        exit 2
       end
     end
 
