@@ -96,6 +96,7 @@ module JasperCommandLine
         if options[:print] || options[:print_silent]
           temp_file = Tempfile.new(['pdf-', '.pdf'])
           file2 = temp_file.path
+          temp_file.close!
 
           ::Prawn::Document.generate(file2, template: file) do |pdf|
             pdf.print if options[:print]
