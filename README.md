@@ -44,7 +44,7 @@ Usage: jasper-command-line [options]
 
 Options:
     -j, --jasper file                The .jasper file to load (if one doesn't exist, it is compiled from the .jrxml file with the same name and on the same location)
-    -d, --data-file file             The .xml file to load the data from
+    -d, --data-file file             The .xml file or url to load the data from
     -c, --copies number              The number of copies to generate
     -l, --locale locale              The locale to use in the report (in the format xx-YY)
         --param name=value           Adds the parameter with name key with the value value (can be defined multiple times)

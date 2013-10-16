@@ -34,6 +34,7 @@ module JasperCommandLine
         require 'optparse'
         require 'optparse/time'
         require 'ostruct'
+        require 'open-uri'
 
         data = {
           :params => {}
@@ -55,8 +56,8 @@ module JasperCommandLine
         end
 
         opts.on('-d', '--data-file file', "The .xml file to load the data from") do |file|
-          raise ArgumentError.new("Data file not found: #{file}") unless File.exists?(file)
-          data[:data] = File.read file
+          raise ArgumentError.new("Data file or URL address not found: #{file}") unless file_exists?(file)
+          data[:data] = open(file) {|f| f.read }
         end
 
         opts.on('-c', '--copies number', Integer, "The number of copies to generate") do |i|
@@ -156,6 +157,19 @@ module JasperCommandLine
         yield data
 
         return index
+      end
+
+      def file_exists?(file)
+        require 'net/http'
+
+        if file =~ /http/
+          url = URI.parse(file)
+          Net::HTTP.start(url.host, url.port) do |http|
+            return http.head(url.request_uri).code == "200"
+          end
+        else
+          File.exists?(file)
+        end
       end
   end
 end
