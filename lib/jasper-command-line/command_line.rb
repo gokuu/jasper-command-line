@@ -163,7 +163,7 @@ module JasperCommandLine
         require 'net/http'
 
         if file =~ /http/
-          url = URI.parse(url)
+          url = URI.parse(file)
           Net::HTTP.start(url.host, url.port) do |http|
             return http.head(url.request_uri).code == "200"
           end
